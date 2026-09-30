@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Roue — Gestion de tontine</title>
+
+<!-- PWA (allégé) : icône + apparence plein-écran "Ajouter à l'écran d'accueil".
+     Pas de vrai service worker ici : un artifact Claude est une page HTML unique,
+     et un service worker doit être chargé depuis un fichier séparé de même origine,
+     ce que cet environnement ne permet pas. -->
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkxhIFJvdWUg4oCUIFRvbnRpbmUiLCAic2hvcnRfbmFtZSI6ICJMYSBSb3VlIiwgImRlc2NyaXB0aW9uIjogIkdlc3Rpb24gZGUgdG9udGluZSAoZGFyZXQpIOKAlCByb3VlIGRlcyB0b3VycyBtZW5zdWVscyIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTYxZjJiIiwgInRoZW1lX2NvbG9yIjogIiMxNjFmMmIiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXhPVElnTVRreUlqNEtQSEpsWTNRZ2QybGtkR2c5SWpFNU1pSWdhR1ZwWjJoMFBTSXhPVElpSUhKNFBTSXpNaUlnWm1sc2JEMGlJekUyTVdZeVlpSXZQZ284WTJseVkyeGxJR040UFNJNU5pSWdZM2s5SWprMklpQnlQU0kyTWlJZ1ptbHNiRDBpYm05dVpTSWdjM1J5YjJ0bFBTSWpZemxoTWpSaUlpQnpkSEp2YTJVdGQybGtkR2c5SWpFMElpOCtDanhqYVhKamJHVWdZM2c5SWprMklpQmplVDBpT1RZaUlISTlJall5SWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUlpTXhaVEk1TXpjaUlITjBjbTlyWlMxM2FXUjBhRDBpTVRRaUlITjBjbTlyWlMxa1lYTm9ZWEp5WVhrOUlqWWdNVFF1TlNJZ2MzUnliMnRsTFdSaGMyaHZabVp6WlhROUlqQWlJRzl3WVdOcGRIazlJakF1TUNJdlBnbzhaeUJ6ZEhKdmEyVTlJaU14WlRJNU16Y2lJSE4wY205clpTMTNhV1IwYUQwaU5pSStDanhzYVc1bElIZ3hQU0k1TmlJZ2VURTlJak0wSWlCNE1qMGlPVFlpSUhreVBTSXhOVGdpTHo0S1BHeHBibVVnZURFOUlqTTBJaUI1TVQwaU9UWWlJSGd5UFNJeE5UZ2lJSGt5UFNJNU5pSXZQZ284YkdsdVpTQjRNVDBpTlRJaUlIa3hQU0kxTWlJZ2VESTlJakUwTUNJZ2VUSTlJakUwTUNJdlBnbzhiR2x1WlNCNE1UMGlNVFF3SWlCNU1UMGlOVElpSUhneVBTSTFNaUlnZVRJOUlqRTBNQ0l2UGdvOEwyYytDanhqYVhKamJHVWdZM2c5SWprMklpQmplVDBpT1RZaUlISTlJakUwSWlCbWFXeHNQU0lqWXpsaE1qUmlJaTgrQ2p3dmMzWm5QZz09IiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn1dfQ==">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIzMiIgZmlsbD0iIzE2MWYyYiIvPgo8Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI2MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzlhMjRiIiBzdHJva2Utd2lkdGg9IjE0Ii8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjYyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxZTI5MzciIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1kYXNoYXJyYXk9IjYgMTQuNSIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIG9wYWNpdHk9IjAuMCIvPgo8ZyBzdHJva2U9IiMxZTI5MzciIHN0cm9rZS13aWR0aD0iNiI+CjxsaW5lIHgxPSI5NiIgeTE9IjM0IiB4Mj0iOTYiIHkyPSIxNTgiLz4KPGxpbmUgeDE9IjM0IiB5MT0iOTYiIHgyPSIxNTgiIHkyPSI5NiIvPgo8bGluZSB4MT0iNTIiIHkxPSI1MiIgeDI9IjE0MCIgeTI9IjE0MCIvPgo8bGluZSB4MT0iMTQwIiB5MT0iNTIiIHgyPSI1MiIgeTI9IjE0MCIvPgo8L2c+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjE0IiBmaWxsPSIjYzlhMjRiIi8+Cjwvc3ZnPg==">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIzMiIgZmlsbD0iIzE2MWYyYiIvPgo8Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI2MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzlhMjRiIiBzdHJva2Utd2lkdGg9IjE0Ii8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjYyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxZTI5MzciIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1kYXNoYXJyYXk9IjYgMTQuNSIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIG9wYWNpdHk9IjAuMCIvPgo8ZyBzdHJva2U9IiMxZTI5MzciIHN0cm9rZS13aWR0aD0iNiI+CjxsaW5lIHgxPSI5NiIgeTE9IjM0IiB4Mj0iOTYiIHkyPSIxNTgiLz4KPGxpbmUgeDE9IjM0IiB5MT0iOTYiIHgyPSIxNTgiIHkyPSI5NiIvPgo8bGluZSB4MT0iNTIiIHkxPSI1MiIgeDI9IjE0MCIgeTI9IjE0MCIvPgo8bGluZSB4MT0iMTQwIiB5MT0iNTIiIHgyPSI1MiIgeTI9IjE0MCIvPgo8L2c+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjE0IiBmaWxsPSIjYzlhMjRiIi8+Cjwvc3ZnPg==">
+<meta name="theme-color" content="#161f2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="La Roue">
+
+<!-- Firebase (utilisé uniquement quand la capacité "db" de Claude n'est pas disponible,
+     c.-à-d. hors de claude.ai — par ex. sur GitHub Pages) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/12.3.0/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/12.3.0/firebase-firestore-compat.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161f2b;
+    --ink-2:#1e2937;
+    --ink-3:#26323f;
+    --paper:#f3eede;
+    --paper-dim:#e7e0cd;
+    --gold:#c9a24b;
+    --gold-soft:#e4c878;
+    --teal:#4a9384;
+    --rust:#c1614f;
+    --text:#ece5d6;
+    --text-dim:#98a2b0;
+    --line: rgba(236,229,214,0.14);
+    --line-strong: rgba(236,229,214,0.26);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height:100vh;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  .top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:36px;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:24px;
+  }
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color: var(--gold-soft);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:38px;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--text-dim);
+    font-size:14.5px;
+    max-width:480px;
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:7px;
+    border:1px solid var(--line-strong);
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{ border-color:var(--gold); color:var(--gold-soft); }
+  .btn.primary{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#241b06;
+  }
+  .btn.primary:hover{ background:var(--gold-soft); color:#241b06;}
+  .btn.danger{ border-color: var(--rust); color:var(--rust); }
+  .btn.danger:hover{ background:var(--rust); color:var(--paper); }
+  .btn.small{ padding:6px 12px; font-size:12.5px; }
+  .btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .admin-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px; color:var(--teal);
+    border:1px solid var(--teal);
+    padding:6px 12px; border-radius:999px;
+    margin-bottom:10px;
+  }
+  .admin-pill .dot{ width:6px;height:6px;border-radius:50%;background:var(--teal); }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:40px;
+    align-items:start;
+  }
+  @media (max-width:820px){ .layout{ grid-template-columns:1fr; } }
+
+  .wheel-card{
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px;
+  }
+  .wheel-caption{
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-top:6px;
+  }
+  svg{ display:block; width:100%; height:auto; }
+  .seg{ cursor:pointer; transition: opacity .15s ease, filter .15s ease; }
+  .seg:hover{ filter:brightness(1.15); }
+  .seg-label{
+    font-family:'Inter',sans-serif;
+    font-size:10.5px;
+    font-weight:600;
+    fill:var(--ink);
+    pointer-events:none;
+  }
+  .seg-label.unassigned{ fill:var(--text-dim); }
+  .seg-label.sabbatical{ fill:var(--text-dim); font-style:italic; }
+  .seg-sub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:8.6px;
+    fill:var(--ink);
+    opacity:0.75;
+    pointer-events:none;
+  }
+  .center-label{ font-family:'Fraunces',serif; font-size:15px; fill:var(--text); }
+  .center-sub{ font-family:'IBM Plex Mono',monospace; font-size:9px; fill:var(--text-dim); letter-spacing:0.06em; }
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:14px;
+    margin-top:18px;
+    font-size:11.5px;
+    color:var(--text-dim);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:10px;height:10px;border-radius:3px; display:inline-block; }
+
+  .panel{
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px;
+    min-height:340px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:24px;
+    margin:0 0 4px;
+  }
+  .panel .month-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--gold-soft);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    margin-bottom:18px;
+    display:block;
+  }
+  .empty-state{
+    color:var(--text-dim);
+    font-size:14px;
+    padding:20px 0;
+  }
+  .receiver-card{
+    background:var(--ink-3);
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    padding:18px 20px;
+    margin-bottom:20px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .receiver-card .name{ font-family:'Fraunces',serif; font-size:19px; font-weight:600; }
+  .receiver-card .bank{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+  .receiver-card .amount{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:22px; color:var(--gold-soft); font-weight:600;
+  }
+  .payers-title{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim);
+    margin:0 0 10px;
+  }
+  .payer-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line);
+    font-size:14px; gap:10px;
+  }
+  .payer-row:last-child{ border-bottom:none; }
+  .payer-name{ font-weight:500; }
+  .payer-bank{ font-size:12px; color:var(--text-dim); }
+  .payer-amount{ font-family:'IBM Plex Mono',monospace; font-size:14px; }
+  .badge{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px; padding:3px 8px; border-radius:999px;
+    text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap;
+  }
+  .badge.same{ background:rgba(74,147,132,0.16); color:var(--teal); border:1px solid var(--teal); }
+  .badge.diff{ background:rgba(193,97,79,0.14); color:var(--rust); border:1px solid var(--rust); }
+  .badge.unknown{ background:rgba(150,150,150,0.10); color:var(--text-dim); border:1px solid var(--line-strong); }
+
+  .total-row{
+    display:flex; justify-content:space-between; margin-top:16px; padding-top:14px;
+    border-top:1px solid var(--line-strong); font-size:13.5px; color:var(--text-dim);
+  }
+  .total-row b{ color:var(--text); font-family:'IBM Plex Mono',monospace; }
+
+  .fee-summary{
+    margin-top:14px; font-size:12px; color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace;
+  }
+
+  section.block{ margin-top:56px; }
+  .block-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px; flex-wrap:wrap; gap:10px;
+  }
+  .block-head h2{ font-family:'Fraunces',serif; font-size:22px; margin:0; font-weight:600; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:0.07em; color:var(--text-dim);
+    padding:8px 10px; border-bottom:1px solid var(--line-strong);
+  }
+  td{ padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tr:last-child td{ border-bottom:none; }
+  .muted{ color:var(--text-dim); }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+
+  .card-list{ display:flex; flex-direction:column; gap:10px; }
+  .part-card{
+    background:var(--ink-3); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .part-card .who{ font-weight:600; }
+  .part-card .meta{ font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .part-card select, .part-card input{
+    background:var(--ink); border:1px solid var(--line-strong); color:var(--text);
+    padding:6px 10px; border-radius:6px; font-size:13px; font-family:'Inter',sans-serif;
+  }
+
+  .form-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px; align-items:end; margin-bottom:8px;
+  }
+  .field label{ display:block; font-size:11px; color:var(--text-dim); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.05em; }
+  .field input, .field select{
+    width:100%; background:var(--ink); border:1px solid var(--line-strong); color:var(--text);
+    padding:9px 11px; border-radius:7px; font-size:14px; font-family:'Inter',sans-serif;
+  }
+  .field input:focus, .field select:focus, .part-card select:focus{ outline:none; border-color:var(--gold); }
+
+  .validation{
+    font-size:12px; margin-top:10px; padding:9px 12px; border-radius:8px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .validation.ok{ background:rgba(74,147,132,0.12); color:var(--teal); border:1px solid var(--teal); }
+  .validation.warn{ background:rgba(193,97,79,0.12); color:var(--rust); border:1px solid var(--rust); }
+
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(10,14,20,0.72);
+    display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal{
+    background:var(--ink-2); border:1px solid var(--line-strong); border-radius:14px;
+    padding:28px; width:100%; max-width:380px;
+  }
+  .modal h3{ font-family:'Fraunces',serif; margin:0 0 6px; font-size:20px; }
+  .modal p{ font-size:13px; color:var(--text-dim); margin:0 0 18px; }
+  .modal input{
+    width:100%; background:var(--ink); border:1px solid var(--line-strong); color:var(--text);
+    padding:11px 13px; border-radius:8px; font-size:14px; margin-bottom:10px; font-family:'Inter',sans-serif;
+  }
+  .modal .actions{ display:flex; gap:10px; margin-top:16px; justify-content:flex-end; }
+  .modal .error{ color:var(--rust); font-size:12.5px; margin:-4px 0 10px; }
+
+  .footnote{
+    margin-top:60px; padding-top:20px; border-top:1px solid var(--line);
+    font-size:11.5px; color:var(--text-dim); line-height:1.6;
+  }
+  .loading{ text-align:center; padding:100px 20px; color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:13px; }
+  .divider{ height:1px; background:var(--line); margin:20px 0; border:none; }
+  .empty-hint{ font-size:12.5px; color:var(--text-dim); font-style:italic; }
+</style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#161f2b">
+</head>
+<body>
+<div id="app" class="wrap"><div class="loading">Chargement de la tontine…</div></div>
+
+<script>
+const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const MONTHS_SHORT = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
+const SABBATICAL = 8; // Septembre
+const BANKS = [
+  "Attijariwafa Bank", "Banque Populaire", "Bank of Africa (BMCE)", "BMCI",
+  "Société Générale Maroc", "Crédit Agricole du Maroc", "CIH Bank",
+  "Al Barid Bank", "CFG Bank", "Crédit du Maroc",
+  "Bank Al-Yousr", "Umnia Bank", "Bank Assafa", "Al Akhdar Bank", "Autre"
+];
+
+const STORAGE_KEY = "tontine-data";
+const DB_PATH = "tontine/data";
+
+let data = null;
+let isAdmin = false;
+let selectedMonth = 9; // Octobre — début réel de ce cycle de daret
+let loginModalOpen = false;
+let loginError = "";
+let persistMode = "none"; // "db" (page publiée claude.ai), "firebase" (hébergement autonome), "storage" (aperçu de chat), "none" (pas de sauvegarde)
+let dbDoc = null;
+
+// Config Firebase (projet "daret-tontine2627") — utilisée quand la page tourne
+// hors de claude.ai (ex. GitHub Pages), où la capacité "db" de Claude n'existe pas.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB4fiTMkPvy-EXitrYTe6Ori3TgrRWyFLI",
+  authDomain: "daret-tontine2627.firebaseapp.com",
+  projectId: "daret-tontine2627",
+  storageBucket: "daret-tontine2627.firebasestorage.app",
+  messagingSenderId: "428594366495",
+  appId: "1:428594366495:web:58fe9b088fe9830ae16d2a"
+};
+
+function defaultData(){
+  // Calendrier réel importé de "CALENDRIER DARET 2026-2027"
+  // Mois: Jan=0 Fév=1 Mar=2 Avr=3 Mai=4 Juin=5 Juil=6 Août=7 Sep=8(repos) Oct=9 Nov=10 Déc=11
+  // Montants manquants dans le document (Hind M2 / Hind M1 / Hind B) déduits à 10000
+  // (chaque mois complet du document totalise exactement 10000). "Asmae Z2" d'avril
+  // renommé "Asmae Z3" (doublon probable avec celui de janvier). À vérifier avec l'admin.
+  const participants = [
+    { id:"p-asmae-z",   name:"Asmae Z",    bank:"" },
+    { id:"p-souad-o",   name:"Souad O",    bank:"" },
+    { id:"p-ghizlane",  name:"Ghizlane",   bank:"" },
+    { id:"p-saida",     name:"Saida",      bank:"" },
+    { id:"p-rachida",   name:"Rachida",    bank:"" },
+    { id:"p-mounir",    name:"Mounir",     bank:"" },
+    { id:"p-lamya-s",   name:"Lamya S",    bank:"" },
+    { id:"p-hind-m",    name:"Hind M",     bank:"" },
+    { id:"p-lamiae-g",  name:"Lamiae G",   bank:"" },
+    { id:"p-rhita",     name:"Rhita",      bank:"" },
+    { id:"p-soumia",    name:"Soumia",     bank:"" },
+    { id:"p-souad-i",   name:"Souad I",    bank:"" },
+    { id:"p-safae",     name:"Safae",      bank:"" },
+    { id:"p-meryem",    name:"Meryem",     bank:"" },
+    { id:"p-ahmed",     name:"Ahmed",      bank:"" },
+    { id:"p-hind-b",    name:"Hind B",     bank:"" },
+    { id:"p-nora",      name:"Nora",       bank:"" },
+    { id:"p-asmae-s",   name:"Asmae S",    bank:"" }
+  ];
+  const parts = [
+    { id:"c1",  participantId:"p-asmae-z",  amount:8000,  month:9  }, // Octobre  (Z1)
+    { id:"c2",  participantId:"p-souad-o",  amount:2000,  month:9  }, // Octobre  (O1)
+    { id:"c3",  participantId:"p-ghizlane", amount:6000,  month:10 }, // Novembre
+    { id:"c4",  participantId:"p-saida",    amount:4000,  month:10 }, // Novembre (1)
+    { id:"c5",  participantId:"p-rachida",  amount:7000,  month:11 }, // Décembre
+    { id:"c6",  participantId:"p-souad-o",  amount:3000,  month:11 }, // Décembre (O2)
+    { id:"c7",  participantId:"p-mounir",   amount:3000,  month:0  }, // Janvier  (2)
+    { id:"c8",  participantId:"p-lamya-s",  amount:4000,  month:0  }, // Janvier  (S1)
+    { id:"c9",  participantId:"p-saida",    amount:1000,  month:0  }, // Janvier  (2)
+    { id:"c10", participantId:"p-asmae-z",  amount:2000,  month:0  }, // Janvier  (Z2)
+    { id:"c11", participantId:"p-hind-m",   amount:10000, month:1  }, // Février  (M2)
+    { id:"c12", participantId:"p-lamiae-g", amount:4000,  month:2  }, // Mars
+    { id:"c13", participantId:"p-rhita",    amount:4000,  month:2  }, // Mars
+    { id:"c14", participantId:"p-soumia",   amount:2000,  month:2  }, // Mars
+    { id:"c15", participantId:"p-asmae-z",  amount:3000,  month:3  }, // Avril    (Z3)
+    { id:"c16", participantId:"p-mounir",   amount:3000,  month:3  }, // Avril    (1)
+    { id:"c17", participantId:"p-souad-i",  amount:2000,  month:3  }, // Avril
+    { id:"c18", participantId:"p-lamya-s",  amount:2000,  month:3  }, // Avril    (S2)
+    { id:"c19", participantId:"p-safae",    amount:5000,  month:4  }, // Mai
+    { id:"c20", participantId:"p-meryem",   amount:1000,  month:4  }, // Mai
+    { id:"c21", participantId:"p-ahmed",    amount:4000,  month:4  }, // Mai
+    { id:"c22", participantId:"p-hind-m",   amount:10000, month:5  }, // Juin     (M1)
+    { id:"c23", participantId:"p-nora",     amount:8000,  month:6  }, // Juillet
+    { id:"c24", participantId:"p-asmae-s",  amount:2000,  month:6  }, // Juillet
+    { id:"c25", participantId:"p-hind-b",   amount:10000, month:7  }  // Août
+  ];
+  return {
+    config: { adminPassword:"", currency:"DH" },
+    participants,
+    parts,
+    manualAssignments: {}
+  };
+}
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+function normalize(d){
+  if(!d.manualAssignments) d.manualAssignments = {};
+  if(!d.config) d.config = { adminPassword:"", currency:"DH" };
+  if(!d.participants) d.participants = [];
+  if(!d.parts) d.parts = [];
+  return d;
+}
+
+function subscribeDoc(){
+  dbDoc.onSnapshot(async (snap)=>{
+    const exists = !!(typeof snap.exists === "function" ? snap.exists() : snap.exists);
+    if(exists){
+      data = normalize(snap.data());
+    } else if(data===null){
+      // Première ouverture : personne n'a encore écrit le document, on l'amorce
+      data = defaultData();
+      try{ await dbDoc.set(data); }catch(e){ console.error("Amorçage impossible", e); }
+    }
+    render();
+  }, (err)=>{
+    console.error("Erreur de synchronisation", err);
+    if(data===null){ data = defaultData(); render(); }
+  });
+}
+
+async function loadData(){
+  // 1) Page publiée sur claude.ai : capacité "db" du runtime Claude (partagée entre tous les viewers)
+  try{
+    if(window.claude && typeof window.claude.use === "function"){
+      const db = await window.claude.use("db");
+      if(db){
+        dbDoc = db.doc(DB_PATH);
+        persistMode = "db";
+        subscribeDoc();
+        return; // le rendu se fait depuis le callback onSnapshot
+      }
+    }
+  }catch(e){ console.error("db indisponible", e); }
+
+  // 2) Hébergement autonome (ex. GitHub Pages) : Firebase Firestore
+  try{
+    if(window.firebase && FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey){
+      if(!firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+      const firestore = firebase.firestore();
+      dbDoc = firestore.collection("tontine").doc("data");
+      persistMode = "firebase";
+      subscribeDoc();
+      return;
+    }
+  }catch(e){ console.error("Firebase indisponible", e); }
+
+  // 3) Repli : aperçu de chat (window.storage), si jamais ouvert dans ce contexte
+  try{
+    if(window.storage && typeof window.storage.get === "function"){
+      const res = await window.storage.get(STORAGE_KEY, true);
+      data = res && res.value ? normalize(JSON.parse(res.value)) : defaultData();
+      persistMode = "storage";
+      render();
+      return;
+    }
+  }catch(e){ /* pas d'aperçu de chat ici, on continue */ }
+
+  // 4) Dernier repli : aucune persistance disponible, données en mémoire seulement
+  persistMode = "none";
+  data = defaultData();
+  render();
+}
+
+async function saveData(){
+  try{
+    if((persistMode==="db" || persistMode==="firebase") && dbDoc){
+      await dbDoc.set(data);
+    } else if(persistMode==="storage"){
+      await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+    }
+  }catch(e){
+    console.error("Erreur de sauvegarde", e);
+    alert("La sauvegarde a échoué. Vérifiez votre connexion et réessayez.");
+  }
+  render();
+}
+
+// ---------- derived helpers ----------
+
+const TURNS = 11; // 11 tours actifs par cycle (12 mois - septembre sabbatique)
+
+function participantById(id){ return data.participants.find(p=>p.id===id); }
+
+function partsForMonth(month){ return data.parts.filter(p=>p.month===month); }
+
+function receivingPartsForMonth(month){ return data.parts.filter(p=>p.month===month); }
+
+function activeMonths(){
+  const arr = [];
+  for(let m=0;m<12;m++){ if(m!==SABBATICAL) arr.push(m); }
+  return arr;
+}
+
+// Montant mensuel total qu'un participant cotise (somme de toutes ses parts)
+function participantMonthlyTotal(participantId){
+  return data.parts
+    .filter(p=>p.participantId===participantId)
+    .reduce((s,p)=>s+Number(p.amount),0);
+}
+
+// Montant réellement perçu pour une part donnée : (montant de la part x 11) - (total mensuel du titulaire)
+function receivedAmountForPart(part){
+  return Number(part.amount)*TURNS - participantMonthlyTotal(part.participantId);
+}
+
+// Recherche exacte d'un sous-ensemble de payeurs dont la somme == target (backtracking)
+function findSubsetSum(payers, target){
+  const sorted = [...payers].sort((a,b)=>b.amount-a.amount);
+  const n = sorted.length;
+  let found = null;
+  function dfs(idx, remaining, chosen){
+    if(remaining===0){ found = chosen.slice(); return true; }
+    if(idx>=n || remaining<0) return false;
+    if(sorted[idx].amount<=remaining){
+      chosen.push(sorted[idx].id);
+      if(dfs(idx+1, remaining-sorted[idx].amount, chosen)) return true;
+      chosen.pop();
+    }
+    return dfs(idx+1, remaining, chosen);
+  }
+  dfs(0, target, []);
+  return found;
+}
+
+// Répartit automatiquement les payeurs restants entre les bénéficiaires restants (somme exacte par bénéficiaire)
+function autoPartition(payers, receivers){
+  let pool = [...payers];
+  const assignment = {};
+  const unresolved = [];
+  const sortedReceivers = [...receivers].sort((a,b)=>b.target-a.target);
+  sortedReceivers.forEach(r=>{
+    const subset = findSubsetSum(pool, r.target);
+    if(subset){
+      subset.forEach(pid=>{ assignment[pid]=r.partId; });
+      pool = pool.filter(p=>!subset.includes(p.id));
+    } else {
+      unresolved.push(r.partId);
+    }
+  });
+  return { assignment, unassignedPayers: pool.map(p=>p.id), unresolvedReceivers: unresolved };
+}
+
+function monthPayments(month){
+  const receivingParts = receivingPartsForMonth(month);
+  if(receivingParts.length===0) return null;
+
+  const receiverIds = new Set(receivingParts.map(p=>p.participantId));
+  const receivers = receivingParts.map(part=>({
+    part,
+    participant: participantById(part.participantId),
+    received: receivedAmountForPart(part)
+  }));
+
+  const payerParticipants = data.participants.filter(p=>!receiverIds.has(p.id));
+  const payerAmounts = payerParticipants
+    .map(p=>({ id:p.id, amount: participantMonthlyTotal(p.id) }))
+    .filter(p=>p.amount>0);
+
+  // Overrides manuels déjà enregistrés pour ce mois
+  const manual = (data.manualAssignments && data.manualAssignments[month]) || {};
+  const manualPayerIds = Object.keys(manual).filter(pid=> payerAmounts.some(pa=>pa.id===pid) && receivingParts.some(rp=>rp.id===manual[pid]));
+
+  const remainingTargets = receivers.map(r=>({ partId: r.part.id, target: r.received }));
+  manualPayerIds.forEach(pid=>{
+    const amt = payerAmounts.find(pa=>pa.id===pid).amount;
+    const t = remainingTargets.find(t=>t.partId===manual[pid]);
+    if(t) t.target -= amt;
+  });
+  const remainingPayers = payerAmounts.filter(pa=>!manualPayerIds.includes(pa.id));
+  const auto = autoPartition(remainingPayers, remainingTargets);
+
+  const fullAssignment = { ...auto.assignment };
+  manualPayerIds.forEach(pid=>{ fullAssignment[pid] = manual[pid]; });
+
+  const receiverViews = receivers.map(r=>{
+    const payers = payerAmounts
+      .filter(pa=> fullAssignment[pa.id]===r.part.id)
+      .map(pa=>{
+        const participant = participantById(pa.id);
+        const receiverParticipant = r.participant;
+        const bankKnown = participant && receiverParticipant && participant.bank && receiverParticipant.bank;
+        return {
+          participant,
+          amount: pa.amount,
+          isManual: manualPayerIds.includes(pa.id),
+          sameBank: !!(bankKnown && participant.bank.trim().toLowerCase()===receiverParticipant.bank.trim().toLowerCase()),
+          bankUnknown: !bankKnown
+        };
+      })
+      .sort((a,b)=> (b.sameBank-a.sameBank) || (b.amount-a.amount));
+    const assignedTotal = payers.reduce((s,p)=>s+p.amount,0);
+    return {
+      part: r.part,
+      receiver: r.participant,
+      received: r.received,
+      payers,
+      assignedTotal,
+      balanced: assignedTotal===r.received,
+      sameBankCount: payers.filter(p=>p.sameBank).length
+    };
+  });
+
+  const totalDistributed = receivers.reduce((s,r)=>s+r.received,0);
+  const totalPayers = payerAmounts.length;
+  const unassignedPayers = payerAmounts.filter(pa=>!fullAssignment[pa.id]);
+
+  return { receiverViews, totalDistributed, totalPayers, allPayers: payerAmounts, unassignedPayers, receivingParts };
+}
+
+function totalPotIfFull(){
+  return data.parts.reduce((s,p)=>s+Number(p.amount||0),0);
+}
+
+
+// ---------- rendering ----------
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    ${renderTop()}
+    <div class="layout">
+      ${renderWheelCard()}
+      ${renderDetailPanel()}
+    </div>
+    ${renderParticipantsBlock()}
+    ${isAdmin ? renderAdminBlock() : ""}
+    ${persistMode==="none" ? `
+    <div class="footnote" style="color:var(--rust); border-color:var(--rust);">
+      ⚠ Aucune sauvegarde disponible dans ce contexte : les modifications ne seront pas conservées après fermeture de la page.
+    </div>` : ""}
+    <div class="footnote">
+      Accès administrateur protégé par mot de passe simple, adapté à un usage privé entre proches — ce n'est pas une sécurité de niveau bancaire.
+      La consultation (roue, tours, paiements) est ouverte à toute personne disposant du lien.
+    </div>
+    ${loginModalOpen ? renderLoginModal() : ""}
+  `;
+  attachEvents();
+}
+
+function renderTop(){
+  return `
+    <div class="top">
+      <div>
+        <p class="brand-eyebrow">Daret · Tontine</p>
+        <h1>La Roue</h1>
+        <p class="sub">Douze mois, onze tours actifs. Chaque mois, un ou plusieurs bénéficiaires touchent leur part — sauf en septembre, mois de repos.</p>
+      </div>
+      <div style="text-align:right;">
+        ${isAdmin ? `<div class="admin-pill"><span class="dot"></span>Mode admin actif</div><br/>` : ""}
+        ${isAdmin
+          ? `<button class="btn" id="logout-btn">Quitter le mode admin</button>`
+          : `<button class="btn primary" id="admin-btn">Mode admin</button>`}
+      </div>
+    </div>
+  `;
+}
+
+function describeArc(cx, cy, rOuter, rInner, startAngle, endAngle){
+  const p = (r,a)=>({ x: cx + r*Math.cos(a), y: cy + r*Math.sin(a) });
+  const s1 = p(rOuter,startAngle), e1 = p(rOuter,endAngle);
+  const s2 = p(rInner,endAngle), e2 = p(rInner,startAngle);
+  const large = (endAngle-startAngle) % (2*Math.PI) > Math.PI ? 1 : 0;
+  return `M ${s1.x} ${s1.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${e1.x} ${e1.y} L ${s2.x} ${s2.y} A ${rInner} ${rInner} 0 ${large} 0 ${e2.x} ${e2.y} Z`;
+}
+
+function renderWheelCard(){
+  const cx=200, cy=200, rOuter=178, rInner=96;
+  const segAngle = (2*Math.PI)/12;
+  const startOffset = -Math.PI/2; // 12 o'clock
+  let segs = "";
+  for(let m=0;m<12;m++){
+    const a0 = startOffset + m*segAngle;
+    const a1 = a0 + segAngle - 0.018;
+    const mid = (a0+a1)/2;
+    const isSabbatical = m===SABBATICAL;
+    const partsThisMonth = receivingPartsForMonth(m);
+    const isSelected = m===selectedMonth;
+
+    let fill = "var(--ink-3)";
+    let stroke = "var(--line-strong)";
+    let strokeWidth = 1;
+    if(isSabbatical){ fill = "url(#hatch)"; }
+    else if(partsThisMonth.length>0){ fill = "var(--gold)"; }
+    if(isSelected){ stroke = "var(--gold-soft)"; strokeWidth = 2.5; }
+
+    const path = describeArc(cx,cy,rOuter,rInner,a0,a1);
+    const labelR = (rOuter+rInner)/2 + 8;
+    const lx = cx + labelR*Math.cos(mid);
+    const ly = cy + labelR*Math.sin(mid) - 4;
+    const subLx = cx + labelR*Math.cos(mid);
+    const subLy = cy + labelR*Math.sin(mid) + 10;
+
+    segs += `<path class="seg" data-month="${m}" d="${path}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"></path>`;
+    segs += `<text class="seg-label ${isSabbatical?'sabbatical':(partsThisMonth.length===0?'unassigned':'')}" x="${lx}" y="${ly}" text-anchor="middle">${MONTHS_SHORT[m]}</text>`;
+    if(isSabbatical){
+      segs += `<text class="seg-sub" x="${subLx}" y="${subLy}" text-anchor="middle" fill="var(--text-dim)">repos</text>`;
+    } else if(partsThisMonth.length===1){
+      const receiver = participantById(partsThisMonth[0].participantId);
+      const shortName = receiver && receiver.name.length>10 ? receiver.name.slice(0,9)+'…' : (receiver?receiver.name:'—');
+      segs += `<text class="seg-sub" x="${subLx}" y="${subLy}" text-anchor="middle">${shortName}</text>`;
+    } else if(partsThisMonth.length>1){
+      segs += `<text class="seg-sub" x="${subLx}" y="${subLy}" text-anchor="middle">${partsThisMonth.length} bénéf.</text>`;
+    } else {
+      segs += `<text class="seg-sub" x="${subLx}" y="${subLy}" text-anchor="middle" fill="var(--text-dim)">libre</text>`;
+    }
+  }
+
+  const currentLabel = MONTHS[selectedMonth];
+
+  return `
+    <div class="wheel-card">
+      <svg viewBox="0 0 400 400">
+        <defs>
+          <pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <rect width="6" height="6" fill="var(--ink-3)"></rect>
+            <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="2"></line>
+          </pattern>
+        </defs>
+        ${segs}
+        <text class="center-label" x="200" y="196" text-anchor="middle">${currentLabel}</text>
+        <text class="center-sub" x="200" y="214" text-anchor="middle">${selectedMonth===SABBATICAL ? 'mois sabbatique' : 'tour du mois'}</text>
+      </svg>
+      <div class="wheel-caption">Cliquez un mois pour voir le détail des paiements</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--gold);"></span>Tour assigné</span>
+        <span><span class="swatch" style="background:var(--ink-3); border:1px dashed var(--line-strong);"></span>Tour libre</span>
+        <span><span class="swatch" style="background:var(--ink-3); background-image:repeating-linear-gradient(45deg, var(--line-strong) 0 2px, transparent 2px 5px);"></span>Septembre — repos</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderDetailPanel(){
+  if(selectedMonth===SABBATICAL){
+    return `
+      <div class="panel">
+        <span class="month-tag">Septembre</span>
+        <h2>Mois sabbatique</h2>
+        <p class="empty-state">Aucune cotisation n'est collectée ni distribuée ce mois-ci. Tout le monde souffle avant la reprise en octobre.</p>
+      </div>
+    `;
+  }
+
+  const pay = monthPayments(selectedMonth);
+
+  if(!pay){
+    return `
+      <div class="panel">
+        <span class="month-tag">${MONTHS[selectedMonth]}</span>
+        <h2>Aucun tour assigné</h2>
+        <p class="empty-state">Ce mois n'a pas encore de bénéficiaire. ${isAdmin ? "Ajoutez ou déplacez une cotisation dans le panneau d'administration ci-dessous." : "L'administrateur n'a pas encore assigné ce mois."}</p>
+      </div>
+    `;
+  }
+
+  const currency = data.config.currency || "DH";
+
+  const receiverBlocks = pay.receiverViews.map(rv=>{
+    const payerRows = rv.payers.map(p=>`
+      <div class="payer-row">
+        <div>
+          <div class="payer-name">${p.participant ? p.participant.name : "—"} ${p.isManual ? '<span class="mono" style="font-size:10px; color:var(--gold-soft);">· manuel</span>' : ''}</div>
+          <div class="payer-bank">${p.participant && p.participant.bank ? p.participant.bank : "banque non renseignée"}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="badge ${p.sameBank?'same':(p.bankUnknown?'unknown':'diff')}">${p.sameBank?'même banque':(p.bankUnknown?'banque inconnue':'banque différente')}</span>
+          <span class="payer-amount">${p.amount.toLocaleString('fr-FR')} ${currency}</span>
+          ${isAdmin ? `<select class="mono" data-reassign-payer="${p.participant.id}" data-reassign-part="${rv.part.id}" style="font-size:11px;">
+            ${pay.receiverViews.map(o=>`<option value="${o.part.id}" ${o.part.id===rv.part.id?'selected':''}>${o.receiver?o.receiver.name:'—'}</option>`).join("")}
+          </select>` : ""}
+        </div>
+      </div>
+    `).join("");
+
+    return `
+      <div class="receiver-card">
+        <div>
+          <div class="name">${rv.receiver ? rv.receiver.name : "—"}</div>
+          <div class="bank">${rv.receiver && rv.receiver.bank ? rv.receiver.bank : "banque non renseignée"}</div>
+        </div>
+        <div class="amount">${rv.received.toLocaleString('fr-FR')} ${currency}</div>
+      </div>
+      <p class="payers-title">Versements assignés (${rv.payers.length}) — total ${rv.assignedTotal.toLocaleString('fr-FR')} ${currency}
+        ${rv.balanced ? '<span style="color:var(--teal);">✓ équilibré</span>' : `<span style="color:var(--rust);">⚠ écart de ${(rv.received-rv.assignedTotal).toLocaleString('fr-FR')} ${currency}</span>`}
+      </p>
+      ${payerRows || '<p class="empty-hint">Aucun payeur assigné.</p>'}
+      <hr class="divider"/>
+    `;
+  }).join("");
+
+  return `
+    <div class="panel">
+      <span class="month-tag">${MONTHS[selectedMonth]} · ${pay.receiverViews.length} bénéficiaire(s)</span>
+      <h2>Détail du mois</h2>
+      ${receiverBlocks}
+      ${isAdmin ? `
+      <div class="total-row">
+        <span>Total distribué ce mois</span>
+        <b>${pay.totalDistributed.toLocaleString('fr-FR')} ${currency}</b>
+      </div>` : ""}
+      <div class="fee-summary">
+        Formule : montant de la cotisation × 11 − total mensuel cotisé par la personne. Chaque payeur verse l'intégralité de son propre total mensuel à un seul bénéficiaire de ce mois.
+        ${isAdmin ? "Vous pouvez réassigner manuellement un payeur vers un autre bénéficiaire via le menu déroulant." : ""}
+      </div>
+    </div>
+  `;
+}
+
+function renderParticipantsBlock(){
+  const currency = data.config.currency || "DH";
+  if(data.participants.length===0){
+    return `
+      <section class="block">
+        <div class="block-head"><h2>Participants</h2></div>
+        <p class="empty-hint">Aucun participant pour l'instant. ${isAdmin?"Ajoutez-en depuis le panneau d'administration.":"L'administrateur n'a pas encore configuré la tontine."}</p>
+      </section>
+    `;
+  }
+  const rows = data.participants.map(part=>{
+    const myParts = data.parts.filter(p=>p.participantId===part.id);
+    const monthly = myParts.reduce((s,p)=>s+Number(p.amount),0);
+    const turns = myParts.map(p=> p.month!==null && p.month!==undefined ? MONTHS_SHORT[p.month] : "non assigné").join(", ") || "—";
+    return `
+      <tr>
+        <td>${part.name}</td>
+        <td class="muted">${part.bank || "—"}</td>
+        <td>${myParts.length}</td>
+        <td class="mono">${monthly.toLocaleString('fr-FR')} ${currency}</td>
+        <td class="muted">${turns}</td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <section class="block">
+      <div class="block-head"><h2>Participants</h2></div>
+      <table>
+        <thead><tr><th>Nom</th><th>Banque</th><th>Cotisations</th><th>Total mensuel</th><th>Tour(s)</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderAdminBlock(){
+  const total = totalPotIfFull();
+  const mod = total % 11;
+  const validation = mod===0
+    ? `<div class="validation ok">✓ Somme totale des cotisations : ${total.toLocaleString('fr-FR')} ${data.config.currency||'DH'} — multiple de 11.</div>`
+    : `<div class="validation warn">⚠ Somme totale des cotisations : ${total.toLocaleString('fr-FR')} ${data.config.currency||'DH'} — pas un multiple de 11 (reste ${mod}). Ajustez les montants.</div>`;
+
+  return `
+    <section class="block">
+      <div class="block-head"><h2>Administration — Participants</h2></div>
+      <div class="form-grid">
+        <div class="field"><label>Nom</label><input id="np-name" placeholder="ex. Sara"/></div>
+        <div class="field"><label>Banque</label><select id="np-bank">
+          <option value="">Non renseignée</option>
+          ${BANKS.map(b=>`<option value="${b}">${b}</option>`).join("")}
+        </select></div>
+        <div class="field"><button class="btn primary" id="add-participant-btn" style="width:100%;">Ajouter</button></div>
+      </div>
+      <div class="card-list" style="margin-top:14px;">
+        ${data.participants.map(part=>`
+          <div class="part-card">
+            <div>
+              <div class="who">${part.name}</div>
+              <div class="meta">${part.bank || "banque non renseignée"}</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select data-edit-bank="${part.id}" style="width:170px;">
+                <option value="" ${!part.bank?'selected':''}>Non renseignée</option>
+                ${BANKS.map(b=>`<option value="${b}" ${part.bank===b?'selected':''}>${b}</option>`).join("")}
+              </select>
+              <button class="btn small" data-save-bank="${part.id}">Enregistrer</button>
+              <button class="btn small danger" data-del-participant="${part.id}">Supprimer</button>
+            </div>
+          </div>
+        `).join("") || '<p class="empty-hint">Aucun participant.</p>'}
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Administration — Cotisations &amp; tours</h2></div>
+      ${validation}
+      <div class="form-grid" style="margin-top:16px;">
+        <div class="field">
+          <label>Participant</label>
+          <select id="pt-participant">
+            ${data.participants.map(p=>`<option value="${p.id}">${p.name}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><label>Montant (multiple de 1000)</label><input id="pt-amount" type="number" step="1000" placeholder="ex. 2000"/></div>
+        <div class="field">
+          <label>Mois assigné</label>
+          <select id="pt-month">
+            <option value="">Non assigné</option>
+            ${activeMonths().map(m=>`<option value="${m}">${MONTHS[m]}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><button class="btn primary" id="add-part-btn" style="width:100%;" ${data.participants.length===0?'disabled':''}>Ajouter le tour</button></div>
+      </div>
+
+      <div class="card-list" style="margin-top:14px;">
+        ${data.parts.slice().sort((a,b)=>{
+            const am = a.month===null||a.month===undefined ? 99 : a.month;
+            const bm = b.month===null||b.month===undefined ? 99 : b.month;
+            return am-bm;
+          }).map(part=>{
+          const owner = participantById(part.participantId);
+          return `
+          <div class="part-card">
+            <div>
+              <div class="who">${owner ? owner.name : "—"}</div>
+              <div class="meta">${Number(part.amount).toLocaleString('fr-FR')} ${data.config.currency||'DH'} / mois</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select data-reassign="${part.id}">
+                <option value="" ${(part.month===null||part.month===undefined)?'selected':''}>Non assigné</option>
+                ${activeMonths().map(m=>`<option value="${m}" ${part.month===m?'selected':''}>${MONTHS[m]}</option>`).join("")}
+              </select>
+              <button class="btn small danger" data-del-part="${part.id}">Supprimer</button>
+            </div>
+          </div>`;
+        }).join("") || '<p class="empty-hint">Aucune cotisation. Ajoutez-en ci-dessus.</p>'}
+      </div>
+      <p class="empty-hint" style="margin-top:12px;">Plusieurs cotisations peuvent partager le même mois (plusieurs bénéficiaires simultanés) — c'est courant dans ce système à paliers.</p>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Réglages</h2></div>
+      <div class="form-grid">
+        <div class="field"><label>Devise (libellé)</label><input id="cfg-currency" value="${data.config.currency||'DH'}"/></div>
+        <div class="field"><button class="btn" id="save-currency-btn" style="width:100%;">Mettre à jour</button></div>
+      </div>
+      <hr class="divider"/>
+      <div class="form-grid">
+        <div class="field"><label>Nouveau mot de passe admin</label><input id="cfg-newpass" type="password" placeholder="••••••"/></div>
+        <div class="field"><button class="btn" id="save-pass-btn" style="width:100%;">Changer le mot de passe</button></div>
+      </div>
+    </section>
+  `;
+}
+
+function renderLoginModal(){
+  const needsSetup = !data.config.adminPassword;
+  return `
+    <div class="modal-bg" id="modal-bg">
+      <div class="modal">
+        <h3>${needsSetup ? "Configurer l'accès admin" : "Mode admin"}</h3>
+        <p>${needsSetup
+          ? "Aucun mot de passe n'est encore défini. Choisissez-en un pour protéger les modifications."
+          : "Entrez le mot de passe administrateur pour modifier la tontine."}</p>
+        ${loginError ? `<div class="error">${loginError}</div>` : ""}
+        <input type="password" id="login-pass" placeholder="Mot de passe" autofocus/>
+        <div class="actions">
+          <button class="btn" id="modal-cancel">Annuler</button>
+          <button class="btn primary" id="modal-confirm">${needsSetup ? "Définir & entrer" : "Entrer"}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- events ----------
+
+function attachEvents(){
+  document.querySelectorAll('.seg').forEach(el=>{
+    el.addEventListener('click', ()=>{ selectedMonth = Number(el.dataset.month); render(); });
+  });
+
+  const adminBtn = document.getElementById('admin-btn');
+  if(adminBtn) adminBtn.addEventListener('click', ()=>{ loginError=""; loginModalOpen=true; render(); });
+
+  const logoutBtn = document.getElementById('logout-btn');
+  if(logoutBtn) logoutBtn.addEventListener('click', ()=>{ isAdmin=false; render(); });
+
+  const modalBg = document.getElementById('modal-bg');
+  if(modalBg){
+    document.getElementById('modal-cancel').addEventListener('click', ()=>{ loginModalOpen=false; loginError=""; render(); });
+    document.getElementById('modal-confirm').addEventListener('click', async ()=>{
+      const val = document.getElementById('login-pass').value;
+      if(!data.config.adminPassword){
+        if(!val || val.length<4){ loginError="Choisissez un mot de passe d'au moins 4 caractères."; render(); return; }
+        data.config.adminPassword = val;
+        isAdmin = true;
+        loginModalOpen = false;
+        loginError = "";
+        await saveData();
+      } else {
+        if(val === data.config.adminPassword){
+          isAdmin = true; loginModalOpen=false; loginError="";
+          render();
+        } else {
+          loginError = "Mot de passe incorrect.";
+          render();
+        }
+      }
+    });
+    document.getElementById('login-pass').addEventListener('keydown', (e)=>{
+      if(e.key==='Enter') document.getElementById('modal-confirm').click();
+    });
+  }
+
+  if(!isAdmin) return;
+
+  const addPBtn = document.getElementById('add-participant-btn');
+  if(addPBtn) addPBtn.addEventListener('click', async ()=>{
+    const name = document.getElementById('np-name').value.trim();
+    const bank = document.getElementById('np-bank').value.trim();
+    if(!name) return;
+    data.participants.push({ id: uid(), name, bank });
+    await saveData();
+  });
+
+  document.querySelectorAll('[data-save-bank]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.saveBank;
+      const input = document.querySelector(`[data-edit-bank="${id}"]`);
+      const part = participantById(id);
+      if(part){ part.bank = input.value.trim(); await saveData(); }
+    });
+  });
+
+  document.querySelectorAll('[data-del-participant]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.delParticipant;
+      const hasParts = data.parts.some(p=>p.participantId===id);
+      if(hasParts && !confirm("Ce participant a des cotisations actives. Les supprimer aussi ?")) return;
+      data.parts = data.parts.filter(p=>p.participantId!==id);
+      data.participants = data.participants.filter(p=>p.id!==id);
+      await saveData();
+    });
+  });
+
+  const addPartBtn = document.getElementById('add-part-btn');
+  if(addPartBtn) addPartBtn.addEventListener('click', async ()=>{
+    const participantId = document.getElementById('pt-participant').value;
+    const amount = Number(document.getElementById('pt-amount').value);
+    const monthVal = document.getElementById('pt-month').value;
+    if(!participantId || !amount || amount<=0){ alert("Renseignez un participant et un montant valide."); return; }
+    if(amount % 1000 !== 0){ alert("Le montant doit être un multiple de 1000."); return; }
+    const month = monthVal===""? null : Number(monthVal);
+    data.parts.push({ id: uid(), participantId, amount, month });
+    await saveData();
+  });
+
+  document.querySelectorAll('[data-reassign]').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      const partId = sel.dataset.reassign;
+      const newMonth = sel.value===""? null : Number(sel.value);
+      const part = data.parts.find(p=>p.id===partId);
+      if(!part) return;
+      part.month = newMonth;
+      // les overrides manuels de paiement de l'ancien et du nouveau mois ne sont plus fiables
+      await saveData();
+    });
+  });
+
+  document.querySelectorAll('[data-reassign-payer]').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      const payerId = sel.dataset.reassignPayer;
+      const newPartId = sel.value;
+      if(!data.manualAssignments[selectedMonth]) data.manualAssignments[selectedMonth] = {};
+      data.manualAssignments[selectedMonth][payerId] = newPartId;
+      await saveData();
+    });
+  });
+
+  document.querySelectorAll('[data-del-part]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.delPart;
+      data.parts = data.parts.filter(p=>p.id!==id);
+      await saveData();
+    });
+  });
+
+  const saveCurrencyBtn = document.getElementById('save-currency-btn');
+  if(saveCurrencyBtn) saveCurrencyBtn.addEventListener('click', async ()=>{
+    const val = document.getElementById('cfg-currency').value.trim();
+    data.config.currency = val || "DH";
+    await saveData();
+  });
+
+  const savePassBtn = document.getElementById('save-pass-btn');
+  if(savePassBtn) savePassBtn.addEventListener('click', async ()=>{
+    const val = document.getElementById('cfg-newpass').value;
+    if(!val || val.length<4){ alert("Le mot de passe doit contenir au moins 4 caractères."); return; }
+    data.config.adminPassword = val;
+    alert("Mot de passe mis à jour.");
+    await saveData();
+  });
+}
+
+loadData();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+</script>
+</body>
+</html>

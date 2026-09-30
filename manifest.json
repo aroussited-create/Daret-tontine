@@ -1,0 +1,14 @@
+{
+  "name": "La Roue — Tontine",
+  "short_name": "La Roue",
+  "description": "Gestion de tontine (daret) — roue des tours mensuels",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#161f2b",
+  "theme_color": "#161f2b",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
